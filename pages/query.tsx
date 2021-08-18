@@ -4,11 +4,40 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import Link from 'next/link'
 import { Button } from '@material-ui/core';
+import { useState } from 'react'
+import { useEffect } from 'react'
+import Autocomplete from "react-google-autocomplete";
 
 const Query: NextPage = () => {
+ 
+    const [location, setLocation] = useState<string>("");
+
+    useEffect(() => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position: GeolocationPosition) => {
+                const pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                };    
+                console.log(pos);
+                setLocation(`${pos.lat},${pos.lng}`)
+            },
+            () => {
+                console.log("No geolocation provided");
+            });
+        }
+        else {
+            console.log("No geolocation provided");
+        }
+    }, [])
 
   /**
+   * figure out state management in nextjs
+   * 
+   *
    * location (ask for current, or address, town) // other fields are disabled until this field
+   * google places api ^
+   * 
    * after location, yelp categories appear, select as many (or optional)
    * price option field
    * 
@@ -40,6 +69,15 @@ const Query: NextPage = () => {
                 <div className={styles.grid}>
 
                 </div> */}
+
+            <Autocomplete
+            apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API}
+            onPlaceSelected={(place) => {
+                console.log(place);
+            }}
+            />
+
+
             </main>
 
             <footer className={styles.footer}>
