@@ -6,11 +6,16 @@ import Link from 'next/link'
 import { Button } from '@material-ui/core';
 import { useState } from 'react'
 import { useEffect } from 'react'
+import LocationSearchInput from '../component/LocationSearchInput'
 import Autocomplete from "react-google-autocomplete";
+import PlacesAutocomplete from 'react-places-autocomplete';
 
 const Query: NextPage = () => {
+
  
-    const [location, setLocation] = useState<string>("");
+    const [lat, setLat] = useState<number>();
+    const [lng, setLng] = useState<number>();
+
 
     useEffect(() => {
         if (navigator.geolocation) {
@@ -20,7 +25,8 @@ const Query: NextPage = () => {
                     lng: position.coords.longitude,
                 };    
                 console.log(pos);
-                setLocation(`${pos.lat},${pos.lng}`)
+                setLat(pos.lat);
+                setLng(pos.lng);
             },
             () => {
                 console.log("No geolocation provided");
@@ -58,7 +64,13 @@ const Query: NextPage = () => {
                 Let&apos;s get you a <a>place to eat</a>
                 </h1>
                 <div className={styles.queryButton}>
-                <Link href="/result" passHref>
+                <Link href={{
+                    pathname: '/result',
+                    query: {
+                        lat: lat,
+                        lng: lng
+                    }
+                }} passHref>
                     <Button variant="contained" color="primary">
                     Let&apos;s begin
                     </Button>
@@ -69,14 +81,6 @@ const Query: NextPage = () => {
                 <div className={styles.grid}>
 
                 </div> */}
-
-            <Autocomplete
-            apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API}
-            onPlaceSelected={(place) => {
-                console.log(place);
-            }}
-            />
-
 
             </main>
 
