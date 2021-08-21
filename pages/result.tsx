@@ -38,7 +38,7 @@ const Result: NextPage = (props) => {
     }
   }, [data, selected])
 
-  const fetchData = () => {
+  const fetchData = async () => {
     const url = `http://localhost:5000/restaurants?lat=${props.lat}&lng=${props.lng}`
     fetch(url)
     .then(response => response.json())
