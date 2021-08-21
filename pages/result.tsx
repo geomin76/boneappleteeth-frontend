@@ -47,11 +47,15 @@ const Result: NextPage = (props) => {
     })
   }
 
+  const settingData = async ({ temp }) => {
+    setData(temp);
+  }
+
   const randomSelect = (index: number) => {
     console.log(`before ${data.length}`);
     const temp = data;
     temp.splice(index, 1);
-    setData(temp);
+    settingData(temp);
     console.log(`After ${data.length}`);
     if (data.length === 0) {
       fetchData();
