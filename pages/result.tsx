@@ -33,12 +33,13 @@ const Result: NextPage = (props) => {
 
   useEffect(() => {
     if (data.length > 0 && selected === null) {
+      console.log("first and should be only")
       const randomElement = Math.floor(Math.random() * data.length)
       setSelected(randomElement);
     }
-  }, [data, selected])
+  }, [data])
 
-  const fetchData = async () => {
+  const fetchData = () => {
     const url = `http://localhost:5000/restaurants?lat=${props.lat}&lng=${props.lng}`
     fetch(url)
     .then(response => response.json())
@@ -47,21 +48,24 @@ const Result: NextPage = (props) => {
     })
   }
 
-  const settingData = async ({ temp }) => {
+  const settingData = async (temp: any) => {
     setData(temp);
   }
 
-  const randomSelect = (index: number) => {
-    console.log(`before ${data.length}`);
+  const settingSelected = async (val: number) => {
+    setSelected(val);
+  }
+
+  const randomSelect = async (index: number) => {
     const temp = data;
     temp.splice(index, 1);
     settingData(temp);
-    console.log(`After ${data.length}`);
     if (data.length === 0) {
       fetchData();
+      return;
     }
     const randomElement = Math.floor(Math.random() * data.length)
-    setSelected(randomElement);
+    settingSelected(randomElement);
   }
 
   return (
@@ -69,8 +73,8 @@ const Result: NextPage = (props) => {
       <div className={styles.container}>
         <main className={styles.main}>
         <h1>First Post</h1>
-        <h2>{selected && data[selected].name}</h2>
-        { selected && 
+        <h2>{selected !== null && data[selected].name}</h2>
+        { selected !== null && 
           <Button variant="contained" color="primary" onClick={() => {
             randomSelect(selected);
           }}>
