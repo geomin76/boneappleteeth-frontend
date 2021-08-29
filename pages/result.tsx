@@ -7,7 +7,6 @@ import styles from '../styles/Home.module.css'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { Button } from '@material-ui/core'
-// const fetcher = (query: RequestDocument) => request('/api/graphql', query)
 
 export async function getServerSideProps(context: { query: { lat: any; lng: any } }) {
   console.log(context.query) 

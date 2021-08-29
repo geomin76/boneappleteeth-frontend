@@ -1,68 +1,70 @@
-import React from 'react';
-import PlacesAutocomplete, {
-  geocodeByAddress,
-  getLatLng,
-} from 'react-places-autocomplete';
- 
-class LocationSearchInput extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { address: '' };
+import React, { useState, useEffect, useRef } from "react";
+
+let autoComplete: google.maps.places.Autocomplete;
+
+const loadScript = (url: string, callback: { (): void; (): void; }) => {
+  let script = document.createElement("script");
+  script.type = "text/javascript";
+
+  if (script.readyState) {
+    script.onreadystatechange = function() {
+      if (script.readyState === "loaded" || script.readyState === "complete") {
+        script.onreadystatechange = null;
+        callback();
+      }
+    };
+  } else {
+    script.onload = () => callback();
   }
- 
-  handleChange = address => {
-    this.setState({ address });
-  };
- 
-  handleSelect = address => {
-    geocodeByAddress(address)
-      .then(results => getLatLng(results[0]))
-      .then(latLng => console.log('Success', latLng))
-      .catch(error => console.error('Error', error));
-  };
- 
-  render() {
-    return (
-      <PlacesAutocomplete
-        value={this.state.address}
-        onChange={this.handleChange}
-        onSelect={this.handleSelect}
-      >
-        {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-          <div>
-            <input
-              {...getInputProps({
-                placeholder: 'Search Places ...',
-                className: 'location-search-input',
-              })}
-            />
-            <div className="autocomplete-dropdown-container">
-              {loading && <div>Loading...</div>}
-              {suggestions.map(suggestion => {
-                const className = suggestion.active
-                  ? 'suggestion-item--active'
-                  : 'suggestion-item';
-                // inline style for demonstration purpose
-                const style = suggestion.active
-                  ? { backgroundColor: '#fafafa', cursor: 'pointer' }
-                  : { backgroundColor: '#ffffff', cursor: 'pointer' };
-                return (
-                  <div
-                    {...getSuggestionItemProps(suggestion, {
-                      className,
-                      style,
-                    })}
-                  >
-                    <span>{suggestion.description}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </PlacesAutocomplete>
-    );
+
+  script.src = url;
+  document.getElementsByTagName("head")[0].appendChild(script);
+};
+
+function handleScriptLoad(updateQuery: React.Dispatch<React.SetStateAction<string>>, lat: number, lng: number, setLat: React.Dispatch<React.SetStateAction<number>>, setLng: React.Dispatch<React.SetStateAction<number>>, autoCompleteRef: React.MutableRefObject<null>) {
+  autoComplete = new window.google.maps.places.Autocomplete(
+    autoCompleteRef.current,
+    { types: ["(cities)"], componentRestrictions: { country: "us" } }
+  );
+  autoComplete.setFields(["address_components", "formatted_address", "geometry"]);
+  autoComplete.addListener("place_changed", () =>
+    handlePlaceSelect(updateQuery, lat, lng, setLat, setLng)
+  );
+}
+
+async function handlePlaceSelect(updateQuery: (arg0: any) => void, lat: number, lng: number, setLat: React.Dispatch<React.SetStateAction<number>>, setLng: React.Dispatch<React.SetStateAction<number>>) {
+  const addressObject = autoComplete.getPlace();
+  console.log(addressObject.geometry?.location?.lat());
+  console.log(addressObject.geometry?.location?.lng());
+  const query = addressObject.formatted_address;
+  updateQuery(query);
+  if (addressObject.geometry?.location?.lat() && addressObject.geometry?.location?.lng()) {
+    setLat(addressObject.geometry?.location?.lat())
+    setLng(addressObject.geometry?.location?.lng())
   }
 }
 
-export default LocationSearchInput;
+const SearchLocationInput = ({lat, lng, setLat, setLng}) => {
+  const [query, setQuery] = useState("");
+  const autoCompleteRef = useRef(null);
+
+  useEffect(() => {
+    loadScript(
+      `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API}&libraries=places`,
+      () => handleScriptLoad(setQuery, lat, lng, setLat, setLng, autoCompleteRef)
+    );
+  }, []);
+
+  return (
+    <div className="search-location-input">
+      <input
+        ref={autoCompleteRef}
+        onChange={event => setQuery(event.target.value)}
+        placeholder="Enter a City"
+        value={query}
+      />
+    </div>
+  );
+}
+
+export default SearchLocationInput;
