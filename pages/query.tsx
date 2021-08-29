@@ -15,25 +15,25 @@ const Query: NextPage = () => {
     const [lng, setLng] = useState<number>();
 
 
-    useEffect(() => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position: GeolocationPosition) => {
-                const pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude,
-                };    
-                console.log(pos);
-                setLat(pos.lat);
-                setLng(pos.lng);
-            },
-            () => {
-                console.log("No geolocation provided");
-            });
-        }
-        else {
-            console.log("No geolocation provided");
-        }
-    }, [])
+    // useEffect(() => {
+    //     if (navigator.geolocation) {
+    //         navigator.geolocation.getCurrentPosition((position: GeolocationPosition) => {
+    //             const pos = {
+    //                 lat: position.coords.latitude,
+    //                 lng: position.coords.longitude,
+    //             };    
+    //             console.log(pos);
+    //             setLat(pos.lat);
+    //             setLng(pos.lng);
+    //         },
+    //         () => {
+    //             console.log("No geolocation provided");
+    //         });
+    //     }
+    //     else {
+    //         console.log("No geolocation provided");
+    //     }
+    // }, [])
 
   /**
    * figure out state management in nextjs
@@ -63,7 +63,7 @@ const Query: NextPage = () => {
                 </h1>
 
                 <div className={styles.grid}>
-                    <SearchLocationInput lat={lat} lng={lng} setLng={setLng} setLat={setLat}/>
+                    <SearchLocationInput lat={lat} lng={lng} setLat={setLat} setLng={setLng}/>
                 </div>
 
                 <div className={styles.queryButton}>
@@ -74,7 +74,7 @@ const Query: NextPage = () => {
                             lng: lng
                         }
                     }} passHref>
-                        <Button variant="contained" color="primary" disabled>
+                        <Button variant="contained" color="primary" disabled={!lat && !lng ? true : false}>
                         Let&apos;s begin
                         </Button>
                     </Link>

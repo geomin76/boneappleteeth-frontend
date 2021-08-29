@@ -21,7 +21,7 @@ const loadScript = (url: string, callback: { (): void; (): void; }) => {
   document.getElementsByTagName("head")[0].appendChild(script);
 };
 
-function handleScriptLoad(updateQuery: React.Dispatch<React.SetStateAction<string>>, lat: number, lng: number, setLat: any, setLng: any, autoCompleteRef: React.MutableRefObject<null>) {
+function handleScriptLoad(updateQuery: React.Dispatch<React.SetStateAction<string>>, lat: number, lng: number, setLat: React.Dispatch<React.SetStateAction<number>>, setLng: React.Dispatch<React.SetStateAction<number>>, autoCompleteRef: React.MutableRefObject<null>) {
   autoComplete = new window.google.maps.places.Autocomplete(
     autoCompleteRef.current,
     { types: ["(cities)"], componentRestrictions: { country: "us" } }
@@ -32,17 +32,19 @@ function handleScriptLoad(updateQuery: React.Dispatch<React.SetStateAction<strin
   );
 }
 
-async function handlePlaceSelect(updateQuery: (arg0: any) => void, lat: number, lng: number, setLat: any, setLng: any) {
+async function handlePlaceSelect(updateQuery: (arg0: any) => void, lat: number, lng: number, setLat: React.Dispatch<React.SetStateAction<number>>, setLng: React.Dispatch<React.SetStateAction<number>>) {
   const addressObject = autoComplete.getPlace();
   console.log(addressObject.geometry?.location?.lat());
   console.log(addressObject.geometry?.location?.lng());
   const query = addressObject.formatted_address;
   updateQuery(query);
-  setLat(addressObject.geometry?.location?.lat())
-  setLng(addressObject.geometry?.location?.lng())
+  if (addressObject.geometry?.location?.lat() && addressObject.geometry?.location?.lng()) {
+    setLat(addressObject.geometry?.location?.lat())
+    setLng(addressObject.geometry?.location?.lng())
+  }
 }
 
-function SearchLocationInput(lat: number, lng: number, setLat: any, setLng: any) {
+const SearchLocationInput = ({lat, lng, setLat, setLng}) => {
   const [query, setQuery] = useState("");
   const autoCompleteRef = useRef(null);
 
