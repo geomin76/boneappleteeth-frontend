@@ -59,30 +59,29 @@ const Query: NextPage = () => {
 
             <main className={styles.main}>
                 <h1 className={styles.title}>
-                Let&apos;s get you a <a>place to eat</a>
+                    Let&apos;s get you a <a>place to eat</a>
                 </h1>
-                <div className={styles.queryButton}>
-                <Link href={{
-                    pathname: '/result',
-                    query: {
-                        lat: lat,
-                        lng: lng
-                    }
-                }} passHref>
-                    <Button variant="contained" color="primary">
-                    Let&apos;s begin
-                    </Button>
-                </Link>
+
+                <div className={styles.grid}>
+                    <SearchLocationInput lat={lat} lng={lng} setLng={setLng} setLat={setLat}/>
                 </div>
 
-                <SearchLocationInput onChange={(val) => {
-                    console.log(val);
-                }}/>
+                <div className={styles.queryButton}>
+                    <Link href={{
+                        pathname: '/result',
+                        query: {
+                            lat: lat,
+                            lng: lng
+                        }
+                    }} passHref>
+                        <Button variant="contained" color="primary" disabled>
+                        Let&apos;s begin
+                        </Button>
+                    </Link>
+                </div>
 
-        {/* 
-                <div className={styles.grid}>
 
-                </div> */}
+        
 
             </main>
 
